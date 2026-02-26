@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: config-server
+  profiles:
+    active: native
+  cloud:
+    config:
+      server:
+        native:
+          search-locations: file:///C:\intellij\projects\ArtLink\config-server\src\main\resources\configurations
+
+server:
+  port: 8888
+

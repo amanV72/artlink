@@ -1,0 +1,16 @@
+server:
+  port: 8081
+
+spring:
+  data:
+    mongodb:
+      uri: ${MONGO_URI}
+      database: artlink
+keycloak:
+  admin:
+    username: artlink_admin
+    password: artlink
+    server-url: http://localhost:8443
+    realm: artlink-app
+    client-id: admin-cli
+    client-uuid: 9597f6be-e59a-45c3-8928-6369917447d0
