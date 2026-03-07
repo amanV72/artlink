@@ -1,15 +1,19 @@
 package com.ecommerce.user.services;
 
 
-import com.ecommerce.user.dto.AddressDTO;
-import com.ecommerce.user.dto.UserRequest;
+
+import com.ecommerce.user.dto.CreateUserRequest;
+import com.ecommerce.user.dto.UpdateUserRequest;
 import com.ecommerce.user.dto.UserResponse;
-import com.ecommerce.user.models.Address;
+import com.ecommerce.user.models.ArtCategory;
+import com.ecommerce.user.models.Skills;
 import com.ecommerce.user.models.User;
+import com.ecommerce.user.repositories.ArtCategoryRepo;
 import com.ecommerce.user.repositories.UserRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -19,49 +23,73 @@ import java.util.stream.Collectors;
 public class UserService {
     private final UserRepo userRepo;
     private final KeyCloakAdminService adminService;
-
-    //private List<User> users = new ArrayList<>();
-    //private Long nextId= 1L;
+    private final ArtCategoryRepo artCategoryRepo;
 
     private UserResponse mapToUserResponse(User user) {
         UserResponse response = new UserResponse();
-        response.setId(String.valueOf(user.getId()));
-        response.setFirstName(user.getFirstName());
-        response.setLastName(user.getLastName());
-        response.setEmail(user.getEmail());
-        response.setPhone(user.getPhone());
-        response.setUserRole(user.getUserRole());
-        if (user.getAddress() != null) {
-            AddressDTO addressDTO = new AddressDTO();
-            addressDTO.setStreet(user.getAddress().getStreet());
-            addressDTO.setCity(user.getAddress().getCity());
-            addressDTO.setState(user.getAddress().getState());
-            addressDTO.setCountry(user.getAddress().getCountry());
-            addressDTO.setZipcode(user.getAddress().getZipcode());
-            response.setAddress(addressDTO);
+        response.setId(user.getId());
+        response.setUsername(user.getUsername());
+        response.setFullName(user.getFullName());
+        response.setBio(user.getBio());
+        if(user.getArtCategory()!=null){
+            response.setCategory(user.getArtCategory().getName());
         }
+        response.setPortfolioUrl(user.getPortfolioUrl());
+        response.setProfilePicture(user.getProfilePicture());
+        response.setFollowersCount(user.getFollowersCount());
+        response.setFollowingCount(user.getFollowingCount());
+        response.setPostsCount(user.getPostsCount());
+        response.setSkills(
+                user.getSkillsList() == null ? List.of() :
+                        user.getSkillsList()
+                                .stream()
+                                .map(Skills::getSkillName)
+                                .toList()
+        );
 
         return response;
 
     }
 
-    private void mapToUser(User user, UserRequest userRequest) {
+    private void mapToUser(User user, CreateUserRequest userRequest) {
 
-        user.setFirstName(userRequest.getFirstName());
-        user.setLastName(userRequest.getLastName());
+        user.setUsername(userRequest.getUsername());
         user.setEmail(userRequest.getEmail());
-        user.setPhone(userRequest.getPhone());
-        if (userRequest.getAddress() != null) {
-            Address address = new Address();
-            address.setCity(userRequest.getAddress().getCity());
-            address.setStreet(userRequest.getAddress().getStreet());
-            address.setState(userRequest.getAddress().getState());
-            address.setZipcode(userRequest.getAddress().getZipcode());
-            address.setCountry(userRequest.getAddress().getCountry());
-            user.setAddress(address);
-        }
+        user.setFullName(userRequest.getFirstName()+" "+userRequest.getLastName());
+
 
     }
+
+    private void updateUserReqToUser(User user, UpdateUserRequest userRequest) {
+
+        if(userRequest.getFullName()!=null) user.setFullName(userRequest.getFullName());
+        if(userRequest.getBio()!=null) user.setBio(userRequest.getBio());
+        if(userRequest.getProfilePicture()!=null) user.setProfilePicture(userRequest.getProfilePicture());
+        if(userRequest.getPortfolioUrl()!=null) user.setPortfolioUrl(userRequest.getPortfolioUrl());
+        if(userRequest.getCategoryId()!=null){
+            ArtCategory category= artCategoryRepo.findById(userRequest.getCategoryId()).orElseThrow(() -> new RuntimeException("Category not found"));
+            user.setArtCategory(category);
+
+        }
+        if(userRequest.getSkillsList()!=null) {
+            if(user.getSkillsList()==null){
+                user.setSkillsList(new ArrayList<>());
+            }else{
+                user.getSkillsList().clear();
+            }
+            List<Skills> skills= userRequest.getSkillsList().stream()
+                    .map(skillName->{
+                        Skills newSkill= new Skills();
+                        newSkill.setSkillName(skillName.trim().toLowerCase());
+                        newSkill.setUser(user);
+                        return newSkill;
+                    }).toList();
+            user.getSkillsList().addAll(skills);
+        }
+
+
+    }
+
 
 
     public List<UserResponse> fetchUsers() {
@@ -72,7 +100,7 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    public void addUser(UserRequest userRequest) {
+    public void addUser(CreateUserRequest userRequest) {
         //user.setId(nextId++);
 
         String token = adminService.getAdminAccessToken();
@@ -85,15 +113,20 @@ public class UserService {
         userRepo.save(user);
     }
 
-    public Optional<UserResponse> fetchOneUser(String id) {
-        return userRepo.findById(String.valueOf(id)).map(this::mapToUserResponse);
+    public Optional<UserResponse> fetchUserById(String id) {
+        return userRepo.findById(Long.valueOf(id)).map(this::mapToUserResponse);
 
     }
 
-    public boolean updateUser(String id, UserRequest userRequest) {
-        return userRepo.findById(String.valueOf(id))
+    public Optional<UserResponse> fetchUserByUsername(String username) {
+        return userRepo.findByUsername(username).map(this::mapToUserResponse);
+
+    }
+
+    public boolean updateUser(String id, UpdateUserRequest userRequest) {
+        return userRepo.findById(Long.valueOf(id))
                 .map(existingUser -> {
-                    mapToUser(existingUser, userRequest);
+                    updateUserReqToUser(existingUser, userRequest);
                     userRepo.save(existingUser);
                     return true;
                 }).orElse(false);

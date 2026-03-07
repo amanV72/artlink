@@ -2,15 +2,22 @@ server:
   port: 8081
 
 spring:
-  data:
-    mongodb:
-      uri: ${MONGO_URI}
-      database: artlink
+  datasource:
+      url: jdbc:mysql://localhost:3307/user
+      username: ${DB_USER}
+      password: ${DB_PASS}
+
+  jpa:
+    database: MYSQL
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+
 keycloak:
   admin:
     username: artlink_admin
-    password: artlink
-    server-url: http://localhost:8443
+    password: artlink_admin
+    server-url: http://localhost:8440
     realm: artlink-app
     client-id: admin-cli
-    client-uuid: 9597f6be-e59a-45c3-8928-6369917447d0
+    client-uuid: a4932992-798c-4a7b-8296-1ff127a69fd4

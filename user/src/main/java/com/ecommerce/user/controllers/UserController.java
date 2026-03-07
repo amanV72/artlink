@@ -1,13 +1,12 @@
 package com.ecommerce.user.controllers;
 
 
-import com.ecommerce.user.dto.UserRequest;
+import com.ecommerce.user.dto.CreateUserRequest;
+import com.ecommerce.user.dto.UpdateUserRequest;
 import com.ecommerce.user.dto.UserResponse;
 import com.ecommerce.user.services.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,10 +19,13 @@ import java.util.List;
 @Slf4j
 public class UserController {
 
-
     private final UserService userService;
-   // private static Logger logger= LoggerFactory.getLogger(UserController.class);
 
+    @PostMapping
+    public ResponseEntity<String> createUser(@RequestBody CreateUserRequest user) {
+        userService.addUser(user);
+        return ResponseEntity.ok("User added!");
+    }
 
     @GetMapping
     public ResponseEntity<List<UserResponse>> getAllUsers() {
@@ -31,22 +33,24 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserResponse> getUser(@PathVariable String id) {
+    public ResponseEntity<UserResponse> getUserById(@PathVariable String id) {
 
-        return userService.fetchOneUser(id)
+        return userService.fetchUserById(id)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
-
     }
 
-    @PostMapping
-    public ResponseEntity<String> createUsers(@RequestBody UserRequest user) {
-        userService.addUser(user);
-        return ResponseEntity.ok("User added!");
+    @GetMapping("/username/{username}")
+    public ResponseEntity<UserResponse> getUserByUsername(@PathVariable String username) {
+
+        return userService.fetchUserByUsername(username)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
+
 
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateUser(@PathVariable String id, @RequestBody UserRequest user) {
+    public ResponseEntity<String> updateUser(@PathVariable String id, @RequestBody UpdateUserRequest user) {
         boolean isUpdated = userService.updateUser(id, user);
         return isUpdated ? ResponseEntity.ok("Updated") : ResponseEntity.notFound().build();
     }

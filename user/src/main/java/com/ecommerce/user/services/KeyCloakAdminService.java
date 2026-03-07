@@ -1,7 +1,6 @@
 package com.ecommerce.user.services;
 
-import com.ecommerce.user.dto.UserRequest;
-import org.apache.coyote.http11.filters.VoidInputFilter;
+import com.ecommerce.user.dto.CreateUserRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -13,7 +12,6 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 @Service
 public class KeyCloakAdminService {
@@ -55,7 +53,7 @@ public class KeyCloakAdminService {
         return response.getBody().get("access_token").toString();
     }
 
-    public String createUser(String token, UserRequest userRequest) {
+    public String createUser(String token, CreateUserRequest userRequest) {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
