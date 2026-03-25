@@ -3,5 +3,9 @@ server:
 
 spring:
   mongodb:
-    uri: mongodb://localhost:27017
+    host: localhost
+    port: 27018
     database: postdb
+    username: root
+    password: root
+    authentication-database: admin

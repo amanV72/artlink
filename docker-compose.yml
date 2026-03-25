@@ -22,6 +22,20 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
 
+  mongodb:
+    image: mongo:latest
+    container_name: mongo-db
+    restart: always
+    ports:
+      - "27018:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+    volumes:
+      - mongo_data:/data/db
+
+
 volumes:
   mysql_data:
+  mongo_data:
 
