@@ -30,8 +30,13 @@ public class PostController {
     }
 
     @GetMapping("/user")
-    public ResponseEntity<List<PostResponseDto>> postByUserId(@RequestHeader("X-User-ID") String userId){
+    public ResponseEntity<List<PostResponseDto>> postsByUserId(@RequestHeader("X-User-ID") String userId){
         return ResponseEntity.ok(postService.getPostByUserId(userId));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<PostResponseDto>> postsByTag(@RequestParam String tag){
+        return ResponseEntity.ok(postService.getPostsByTag(tag));
     }
 
 }

@@ -10,4 +10,5 @@ import java.util.Optional;
 @Repository
 public interface PostRepo extends MongoRepository<Post,String> {
     Optional<List<Post>> findByUserIdOrderByCreatedAtDesc(String userId);
+    Optional<List<Post>> findByTagsOrderByCreatedAtDesc(String tag);
 }

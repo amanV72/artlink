@@ -73,4 +73,11 @@ public class PostService {
                 .map(this::mapToPostResponse).toList();
 
     }
+
+    public List<PostResponseDto> getPostsByTag(String tag) {
+        List<Post> posts= postRepo.findByTagsOrderByCreatedAtDesc(tag).orElseThrow();
+        return posts
+                .stream()
+                .map(this::mapToPostResponse).toList();
+    }
 }
