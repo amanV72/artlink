@@ -12,6 +12,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Data
 @Document(collection = "posts")
@@ -29,7 +30,7 @@ public class Post {
 
     private List<String> tags;
 
-    private List<String> mediaIds;
+    private List<Media> media;
 
     private long likeCount;
 

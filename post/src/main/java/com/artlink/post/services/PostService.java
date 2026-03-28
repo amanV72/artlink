@@ -1,7 +1,9 @@
 package com.artlink.post.services;
 
+import com.artlink.post.dtos.MediaDto;
 import com.artlink.post.dtos.PostRequestDto;
 import com.artlink.post.dtos.PostResponseDto;
+import com.artlink.post.models.Media;
 import com.artlink.post.models.Post;
 import com.artlink.post.repo.PostRepo;
 import jakarta.annotation.PostConstruct;
@@ -9,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -33,7 +36,14 @@ public class PostService {
         post.setUserId(userId);
         post.setCaption(requestDto.getCaption());
         post.setTags(requestDto.getTags());
-        post.setMediaIds(requestDto.getMediaIds());
+        post.setMedia(requestDto.getMediaDto().stream().map(dto->{
+            Media media= new Media();
+            media.setId(dto.getId());
+            media.setUrl(dto.getUrl());
+            media.setType(dto.getType());
+            return media;
+        }).toList()
+        );
         post.setLikeCount(0);
         post.setCommentCount(0);
         return post;
@@ -45,7 +55,14 @@ public class PostService {
         postResponseDto.setUserId(post.getUserId());
         postResponseDto.setCaption(post.getCaption());
         postResponseDto.setTags(post.getTags());
-        postResponseDto.setMediaIds(post.getMediaIds());
+        postResponseDto.setMedia(post.getMedia().stream().map(media->{
+                    MediaDto dto = new MediaDto();
+                    dto.setId(media.getId());
+                    dto.setUrl(media.getUrl());
+                    dto.setType(media.getType());
+                    return dto;
+        }).toList()
+        );
         postResponseDto.setLikeCount(post.getLikeCount());
         postResponseDto.setCommentCount(post.getCommentCount());
         postResponseDto.setCreatedAt(post.getCreatedAt());
@@ -76,6 +93,13 @@ public class PostService {
 
     public List<PostResponseDto> getPostsByTag(String tag) {
         List<Post> posts= postRepo.findByTagsOrderByCreatedAtDesc(tag).orElseThrow();
+        return posts
+                .stream()
+                .map(this::mapToPostResponse).toList();
+    }
+
+    public List<PostResponseDto> getPostsForFeed() {
+        List<Post> posts= postRepo.findAllByOrderByCreatedAtDesc(PageRequest.of(0,10)).orElseThrow();
         return posts
                 .stream()
                 .map(this::mapToPostResponse).toList();

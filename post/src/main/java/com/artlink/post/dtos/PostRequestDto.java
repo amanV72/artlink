@@ -11,6 +11,6 @@ public class PostRequestDto {
 
     private List<String> tags;
 
-    private List<String> mediaIds;
+    private List<MediaDto> mediaDto;
 
 }

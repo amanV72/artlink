@@ -19,7 +19,6 @@ public class PostController {
 
     @PostMapping
     public ResponseEntity<Void> uploadPost(@RequestHeader("X-User-ID") String userId, @RequestBody PostRequestDto requestDto){
-        log.info("Received request is: {}",requestDto.getCaption());
         postService.createPost(requestDto,userId);
         return ResponseEntity.noContent().build();
     }
@@ -37,6 +36,11 @@ public class PostController {
     @GetMapping("/search")
     public ResponseEntity<List<PostResponseDto>> postsByTag(@RequestParam String tag){
         return ResponseEntity.ok(postService.getPostsByTag(tag));
+    }
+
+    @GetMapping("/feed")
+    public ResponseEntity<List<PostResponseDto>> postsForFeed(){
+        return ResponseEntity.ok(postService.getPostsForFeed());
     }
 
 }

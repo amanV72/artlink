@@ -21,7 +21,7 @@ public class PostResponseDto {
 
     private List<String> tags;
 
-    private List<String> mediaIds;
+    private List<MediaDto> media;
 
     private long likeCount;
 
