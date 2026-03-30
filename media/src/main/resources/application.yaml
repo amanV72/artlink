@@ -1,3 +1,5 @@
 spring:
   application:
-    name: media
+    name: media-service
+  config:
+    import: configserver:http://localhost:8888

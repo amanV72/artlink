@@ -1,25 +1,27 @@
-package com.artlink.media.model;
+package com.artlink.media.models;
 
 import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Data
+@EntityListeners(AuditingEntityListener.class)
 public class Media {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     private String fileName;
     private String url;
     @Enumerated(EnumType.STRING)
     private MediaType type;
-    private long size;
-    private long userId;
+    private Long size;
+    private String userId;
 
     @CreatedDate
     private LocalDateTime createdAt;
