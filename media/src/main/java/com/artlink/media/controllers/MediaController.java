@@ -3,10 +3,12 @@ package com.artlink.media.controllers;
 import com.artlink.media.dtos.MediaResponseDto;
 import com.artlink.media.services.MediaService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/media")
 @RequiredArgsConstructor
@@ -17,6 +19,9 @@ public class MediaController {
     public ResponseEntity<MediaResponseDto> uploadMedia(
             @RequestHeader("X-User-ID") String userId,
             @RequestParam("file")MultipartFile file){
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
         MediaResponseDto response=mediaService.uploadFile(userId,file);
         return ResponseEntity.ok(response);
     }
